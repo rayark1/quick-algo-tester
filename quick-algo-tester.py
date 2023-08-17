@@ -32,6 +32,10 @@ def test_solution(solution_folder, solution_file):
         with open(output_file, 'r') as file:
             expected_output = file.read()
 
+        if not input_data.strip() or not expected_output.strip():
+            print(Fore.YELLOW + f"Warning: Test case {i+1} has empty input or output. Skipping this test." + Fore.RESET)
+            continue
+
         try:
             result = subprocess.run(['python', os.path.join(solution_folder, solution_file)], input=input_data, text=True, capture_output=True, check=True)
         except subprocess.CalledProcessError:
