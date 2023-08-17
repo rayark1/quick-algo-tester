@@ -37,9 +37,14 @@ def test_solution(solution_folder, solution_file):
             continue
 
         try:
-            result = subprocess.run(['python', os.path.join(solution_folder, solution_file)], input=input_data, text=True, capture_output=True, check=True)
+            result = subprocess.run(['python', os.path.join(solution_folder, solution_file)], input=input_data, text=True, capture_output=True)
+            result.check_returncode()  # This will raise the CalledProcessError if the return code is non-zero
         except subprocess.CalledProcessError:
-            print(Fore.RED + f"Error: Failed to run the solution file '{solution_file}'" + Fore.RESET)
+            if result.stderr:  # Python script produced an error
+                print(Fore.RED + f"Error in test case {i+1} while running the solution file '{solution_file}':" + Fore.RESET)
+                print(result.stderr.strip())  # Display the actual error from the Python script
+            else:
+                print(Fore.RED + f"Error: Failed to run the solution file '{solution_file}'" + Fore.RESET)
             return
 
         if result.stdout.strip() == expected_output.strip():
